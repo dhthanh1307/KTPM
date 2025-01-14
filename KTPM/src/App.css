@@ -1,0 +1,19 @@
+html, body {
+  height: 100%; 
+  margin: 0; 
+  padding: 0;
+}
+.containerfluid {
+  display: flex;
+  flex-direction: column;
+  padding-top: 80px; 
+  margin: 20px;
+  transition: padding-left 0.3s ease; 
+  padding-bottom: 40px;
+
+}
+
+.containerfluid.action-bar-open {
+  padding-left: 250px; 
+  padding-bottom: 40px;
+}
