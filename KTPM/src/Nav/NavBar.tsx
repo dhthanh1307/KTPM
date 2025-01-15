@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FaTachometerAlt, FaTags, FaChartLine, FaUser, FaSignOutAlt } from 'react-icons/fa';
-import {  Dropdown, Nav } from 'react-bootstrap';
+import { Dropdown, Nav } from 'react-bootstrap';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './NavBar.css';
+// import { initWebSocket, closeWebSocket } from '../Service/socketService';
 
 
 interface ActionBarProps {
@@ -16,23 +17,10 @@ const ActionBar: React.FC<ActionBarProps> = ({ isOpen, toggleSidebar }) => {
   const toggleNotification = () => {
     setShowNotifications(!showNotifications);
   };
-  const [notifications, setNotifications] = useState<any[]>([{
-    title: 'Chào mừng!',
-    content: 'Hello, this is your first notification.',
-    type: 'info'
-  },
-  {
-    title: 'Thông báo quan trọng',
-    content: 'Please update your profile.',
-    type: 'warning'
-  },
-  {
-    title: 'Lỗi hệ thống',
-    content: 'An error occurred while fetching data.',
-    type: 'error'
-  }]); // State để lưu trữ thông báo
+  const [notifications, setNotifications] = useState<any[]>([]); // State để lưu trữ thông báo
   // const [socket, setSocket] = useState<WebSocket | null>(null);
   // Hàm đăng xuất
+
   const handleLogout = () => {
     // Xóa thông tin đăng nhập khỏi localStorage
     localStorage.removeItem('accessToken');
@@ -40,15 +28,18 @@ const ActionBar: React.FC<ActionBarProps> = ({ isOpen, toggleSidebar }) => {
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('username');
     localStorage.removeItem('password');
-
+    const accessToken = localStorage.getItem('accessToken'); // Lấy token từ localStorage
+    const ws = new WebSocket(`ws://localhost:3005?token=${accessToken}`);
+    ws.close();
     // Chuyển hướng về trang login
     navigate('/');
   };
-  useEffect(() => {
-    const token = localStorage.getItem('accessToken'); // Lấy token từ localStorage
-    const ws = new WebSocket(`ws://localhost:3100?token=${token}`); // Kết nối WebSocket
 
-    // Lắng nghe sự kiện khi WebSocket kết nối thành công
+  useEffect(() => {
+    // Kết nối WebSocket
+
+    const accessToken = localStorage.getItem('accessToken'); // Lấy token từ localStorage
+    const ws = new WebSocket(`ws://localhost:3005?token=${accessToken}`);
     ws.addEventListener('open', () => {
       console.log('WebSocket connection established');
     });
@@ -57,20 +48,29 @@ const ActionBar: React.FC<ActionBarProps> = ({ isOpen, toggleSidebar }) => {
     ws.addEventListener('message', (event) => {
       const message = JSON.parse(event.data);
       const newNotify = [message, ...notifications]
-      setNotifications(newNotify); // Thêm thông báo mới vào danh sách
+      console.log('message:', message);
+      console.log('notify:', notifications);
+      console.log('new:', newNotify);
+      setNotifications(prevNotifications => [message, ...prevNotifications]); // Thêm thông báo mới vào danh sách
     });
 
     // Lắng nghe lỗi trong kết nối WebSocket
     ws.addEventListener('error', (error) => {
-      console.error('WebSocket error:', error);
+      console.log('WebSocket error:', error);
     });
+    // Lắng nghe sự kiện khi WebSocket kết nối thành công
+
     // setSocket(ws);
     // Đảm bảo đóng WebSocket khi component unmount
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
+    // return () => {
+    //   if (ws) {
+    //     ws.close();
+    //   }
+    // };
+    // if(accessToken){
+    //   initWebSocket(accessToken);
+
+    // }
   }, []);
   return (
     <div className="action-bar-container ">
@@ -128,7 +128,7 @@ const ActionBar: React.FC<ActionBarProps> = ({ isOpen, toggleSidebar }) => {
               <Dropdown.Item
                 as="li"
                 key={index}
-                className={`notification-item notification-${notification.type}` }
+                className={`notification-item notification-${notification.type}`}
               >
                 <div className="notification-header">
                   <strong>{notification.title}</strong>

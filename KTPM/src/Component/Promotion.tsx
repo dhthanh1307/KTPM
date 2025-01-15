@@ -40,6 +40,7 @@ const Promotion = () => {
       try {
         console.log(partnerId);
         const accessToken = localStorage.getItem('accessToken');
+        // alert(partnerId)
 
         // Cấu hình headers
         const config = {

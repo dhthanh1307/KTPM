@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Container, Row, Form, Alert } from 'react-bootstrap';
-
+// import { initWebSocket, closeWebSocket } from "../Service/socketService.js;
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -18,6 +18,8 @@ const Login: React.FC = () => {
       localStorage.setItem('refreshToken', response.data.refreshToken);
       localStorage.setItem('username', username);
       localStorage.setItem('password', password);
+      // initWebSocket(response.data.accessToken);
+
       setMessage('Đăng nhập thành công!');
       navigate('/event');
     } catch (error) {
@@ -70,14 +72,14 @@ const Login: React.FC = () => {
                 className='rounded-3 p-2 fs-5'
               />
             </Form.Group>
-            
+
             <Button variant="primary" type="submit" className="w-100 mt-3 rounded-5 p-2 fs-3 fw-bold" style={{
               background: 'linear-gradient(45deg, #7e2e8f, #4a90e2)',
             }}>
               LOGIN
             </Button>
           </Form>
-          <h5 className="text-center fw-bold mb-4"> Already have an account? 
+          <h5 className="text-center fw-bold mb-4"> Already have an account?
             <a href="/register" className="text-primary"> Register</a>
           </h5>
         </Col>
